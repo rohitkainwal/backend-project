@@ -1,59 +1,32 @@
 import Dotenv from "dotenv"
 import connectDB from "./db/index.js"
-import express from "express"
+import { app } from "./app.js"
 
-
-const app = express();
+// Load environment variables FIRST
 Dotenv.config({
-    path: './env'
+    path: './.env'
 })
 
+console.log("🔧 Environment loaded")
+console.log("📡 PORT:", process.env.PORT)
+
+// Connect to database and start server
 connectDB()
-.then(()=>{
-    app.listen(process.env.PORT || 8000, ()=>{
-        console.log(`server is running at port : $ {process.env.PORT}`)
+.then(() => {
+    // Listen for app errors
+    app.on("error", (error) => {
+        console.log("❌ Express app error:", error)
+        throw error
+    })
+    
+    // Start server
+    const PORT = process.env.POR || 8000
+    app.listen(PORT, () => {
+        console.log(`\n✅ Server is running at: http://localhost:${PORT}`)
+        console.log(`📍 Test endpoint: http://localhost:${PORT}/api/v1/users/register\n`)
     })
 })
-.catch((err)=>{
-    console.log("MONGO  db connection failed !!!", err)
+.catch((err) => {
+    console.log("❌ MONGO DB connection failed !!!", err)
+    process.exit(1)
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-import express from "express"
-import { express } from 'ex';
-const app = express()
-
-(async () => {
-    try {
-        await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
-        app.on("error", ()=>{
-            console.log("ERRR:", error);
-            throw error
-        })
-
-        app.listen(process.env.PORT, () =>{
-            console.log(`App is listning on port $ {process.env.PORT}`);
-        })
-
-
-    } catch (error) {
-        console.error("Error:" ,error)
-        throw err
-    }
-})() */
